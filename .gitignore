@@ -1,0 +1,6 @@
+__pycache__/
+*.py[cod]
+.nfs*
+build/
+dist/
+easy_module_attribute_getter.egg-info/
