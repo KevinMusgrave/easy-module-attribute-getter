@@ -1,0 +1,1 @@
+# easy_module_attribute_getter
