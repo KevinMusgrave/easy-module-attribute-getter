@@ -7,8 +7,8 @@ from io import StringIO
 
 
 class YamlReader:
-    def __init__(self, argparser):
-        self.argparser = argparser
+    def __init__(self, argparser=None):
+        self.argparser = argparser if argparser is not None else argparse.ArgumentParser()
         self.args, self.unknown_args = self.argparser.parse_known_args()
         self.add_unknown_args()
 

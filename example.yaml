@@ -1,0 +1,13 @@
+models:
+  modelA:
+    densenet121:
+      pretrained: True
+      memory_efficient: True
+  modelB:
+    resnext50_32x4d:
+      pretrained: True
+losses:
+  lossA:
+    CrossEntropyLoss:
+  lossB:
+    L1Loss:
