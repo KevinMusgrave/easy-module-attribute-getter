@@ -31,24 +31,18 @@ args, _, _ = yaml_reader.load_yamls(['example.yaml'])
 pytorch_getter = PytorchGetter()
 models = pytorch_getter.get_multiple("model", args.models)
 losses = pytorch_getter.get_multiple("loss", args.losses)
-# "models" is a dictionary with keys "modelA" and "modelB" as specified
-# in the yaml file. The values are the loaded objects (in this case
-# pytorch models).
-# The same is true for "losses".
 ```
+"models" is a dictionary with keys "modelA" and "modelB" as specified in the yaml file. The values are the loaded objects, which in this case are PyTorch models. The same is true for "losses".
+
 
 ## Easily register your own modules into an existing getter.
 ```
 from pytorch_metric_learning import losses, miners, samplers 
 pytorch_getter = PytorchGetter()
-# The 'loss' key already exists, so the 'losses' module will be appended to the existing module.
 pytorch_getter.register('loss', losses) 
 pytorch_getter.register('miner', miners)
 pytorch_getter.register('sampler', samplers)
-
-# Both modules will be searched when get() or get_multiple() is used.
-# The first loss comes from the module that was just registered.
-# The second loss comes from the Pytorch library that is registered by default.
 metric_loss = pytorch_getter.get('loss', class_name='TripletMarginLoss', return_uninitialized=True)
 kl_div_loss = pytorch_getter.get('loss', class_name='KLDivLoss', return_uninitialized=True)
 ```
+In the above example, the 'loss' key already exists, so the 'losses' module will be appended to the existing module. Both modules are searched when get() or get_multiple() is used. For example, metric_loss contains an object from the pytorch_metric_learning library, whil kl_div_loss contains an object from the PyTorch library, which was registered by default.
