@@ -103,12 +103,29 @@ transforms:
     CenterCrop:
       size: 227
 ```
-Then load a composed transform in your script:
+Then load composed transforms in your script:
 ```
 transforms = {}
 for k, v in args.transforms.items():
     transforms[k] = pytorch_getter.get_composed_img_transform(v, mean = [0.485, 0.456, 0.406], std = [0.229, 0.224, 0.225])
 ```
+The transforms dict now contains:
+```
+{'train': Compose(
+    Resize(size=256, interpolation=PIL.Image.BILINEAR)
+    RandomResizedCrop(size=(227, 227), scale=(0.16, 1), ratio=(0.75, 1.33), interpolation=PIL.Image.BILINEAR)
+    RandomHorizontalFlip(p=0.5)
+    ToTensor()
+    Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+), 'eval': Compose(
+    Resize(size=256, interpolation=PIL.Image.BILINEAR)
+    CenterCrop(size=(227, 227))
+    ToTensor()
+    Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+)}
+```
+
+
 ### Optimizers, schedulers, and gradient clippers
 Optionally specify the scheduler and gradient clipping norm, within the optimizer parameters.
 ```
