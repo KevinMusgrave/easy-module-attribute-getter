@@ -1,3 +1,4 @@
+__version__ = "0.9.12"
 from .yaml_reader import YamlReader
 from .easy_module_attribute_getter import EasyModuleAttributeGetter
 try:

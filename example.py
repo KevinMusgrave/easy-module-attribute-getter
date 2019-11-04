@@ -7,9 +7,13 @@ pytorch_getter = PytorchGetter()
 models = pytorch_getter.get_multiple("model", args.models)
 losses = pytorch_getter.get_multiple("loss", args.losses)
 
-print(models)
-print(losses)
+transforms = {}
+for k, v in args.transforms.items():
+    transforms[k] = pytorch_getter.get_composed_img_transform(v, mean = [0.485, 0.456, 0.406], std = [0.229, 0.224, 0.225])
 
+print(models.keys())
+print(losses)
+print(transforms)
 
 ### the modules I want to add ###
 from pytorch_metric_learning import losses, miners, samplers 
@@ -22,7 +26,7 @@ pytorch_getter.register('sampler', samplers)
 # Both modules will be searched when get() or get_multiple() is used.
 # The first loss comes from the module that was just registered.
 # The second loss comes from the Pytorch library that is registered by default.
-metric_loss = pytorch_getter.get('loss', class_name='TripletMarginLoss', return_uninitialized=True)
+metric_loss = pytorch_getter.get('loss', class_name='ProxyNCALoss', return_uninitialized=True)
 kl_div_loss = pytorch_getter.get('loss', class_name='KLDivLoss', return_uninitialized=True)
 print(metric_loss)
 print(kl_div_loss)

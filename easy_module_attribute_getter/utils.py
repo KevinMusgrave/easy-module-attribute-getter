@@ -14,16 +14,6 @@ def merge_two_dicts(x, y):
     return z
 
 
-def merge_two_dicts_without_overwriting_subdicts(x, y):
-    z = x.copy()  # start with x's keys and values
-    for k, v in y.items():
-        if k in z and isinstance(z[k], dict):
-            z[k] = merge_two_dicts(z[k], v)
-        else:
-            z[k] = v
-    return z
-
-
 def string_to_num(s):
     """
     If input is not a string, then return input.
