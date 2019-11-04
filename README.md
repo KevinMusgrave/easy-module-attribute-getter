@@ -70,6 +70,17 @@ kl_div_loss = pytorch_getter.get('loss', class_name='KLDivLoss', return_uninitia
 ```
 In the above example, the 'loss' key already exists, so the 'losses' module will be appended to the existing module.
 
+### Load multiple yaml files into one args object
+Provide a list of filepaths:
+```
+args, _, _ = yaml_reader.load_yamls(['models.yaml', 'optimizers.yaml', 'transforms.yaml'])
+```
+Or provide a root path and a dictionary mapping subfolder names to the bare filename
+```
+root_path = "/where/your/yaml/subfolders/are/"
+subfolder_to_name_dict = {"models": "default", "optimizers": "special_trial", "transforms": "blah"}
+args, _, _ = yaml_reader.load_yamls(root_path=root_path, subfolder_to_name_dict=subfolder_to_name_dict)
+```
 
 ## Pytorch-specific features
 ### Transforms
