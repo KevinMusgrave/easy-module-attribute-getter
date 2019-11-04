@@ -43,14 +43,29 @@ elif args.losses["lossA"] == "L1Loss":
 ## The Solution
 ### Use this package, and get rid of all those annoying if-statements and switches:
 ```
-from easy_module_attribute_getter import YamlReader, PytorchGetter
-yaml_reader = YamlReader()
-args, _, _ = yaml_reader.load_yamls(['example.yaml'])
+from easy_module_attribute_getter import PytorchGetter
 pytorch_getter = PytorchGetter()
 models = pytorch_getter.get_multiple("model", args.models)
 losses = pytorch_getter.get_multiple("loss", args.losses)
 ```
 "models" and "losses" are dictionaries that map from strings to the desired objects.
+
+### Load one or multiple yaml files into one args object
+```
+from easy_module_attribute_getter import YamlReader
+yaml_reader = YamlReader()
+args, _, _ = yaml_reader.load_yamls(['example.yaml'])
+```
+Provide a list of filepaths:
+```
+args, _, _ = yaml_reader.load_yamls(['models.yaml', 'optimizers.yaml', 'transforms.yaml'])
+```
+Or provide a root path and a dictionary mapping subfolder names to the bare filename
+```
+root_path = "/where/your/yaml/subfolders/are/"
+subfolder_to_name_dict = {"models": "default", "optimizers": "special_trial", "transforms": "blah"}
+args, _, _ = yaml_reader.load_yamls(root_path=root_path, subfolder_to_name_dict=subfolder_to_name_dict)
+```
 
 ### Override complex config options via the command line:
 The example yaml file contains 'models' which maps to a nested dictionary. This key can optionally be overridden at the command line, using the standard python notation for nested dictionaries. In this example, instead of loading densenet121 and resnext50, as specified in the config file, the program will instead load googlenet and resnet18.
@@ -70,17 +85,6 @@ kl_div_loss = pytorch_getter.get('loss', class_name='KLDivLoss', return_uninitia
 ```
 In the above example, the 'loss' key already exists, so the 'losses' module will be appended to the existing module.
 
-### Load multiple yaml files into one args object
-Provide a list of filepaths:
-```
-args, _, _ = yaml_reader.load_yamls(['models.yaml', 'optimizers.yaml', 'transforms.yaml'])
-```
-Or provide a root path and a dictionary mapping subfolder names to the bare filename
-```
-root_path = "/where/your/yaml/subfolders/are/"
-subfolder_to_name_dict = {"models": "default", "optimizers": "special_trial", "transforms": "blah"}
-args, _, _ = yaml_reader.load_yamls(root_path=root_path, subfolder_to_name_dict=subfolder_to_name_dict)
-```
 
 ## Pytorch-specific features
 ### Transforms
