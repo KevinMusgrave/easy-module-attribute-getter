@@ -11,9 +11,18 @@ transforms = {}
 for k, v in args.transforms.items():
     transforms[k] = pytorch_getter.get_composed_img_transform(v, mean = [0.485, 0.456, 0.406], std = [0.229, 0.224, 0.225])
 
+optimizers = {}
+schedulers = {}
+grad_clippers = {}
+for k, v in models.items():
+	optimizers[k], schedulers[k], grad_clippers[k] = pytorch_getter.get_optimizer(v, yaml_dict=args.optimizers[k])
+
 print(models.keys())
 print(losses)
 print(transforms)
+print(optimizers)
+print(schedulers)
+print(grad_clippers)
 
 ### the modules I want to add ###
 from pytorch_metric_learning import losses, miners, samplers 
