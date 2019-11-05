@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="easy_module_attribute_getter",
-    version="0.9.13",
+    version="0.9.14",
     author="Kevin Musgrave",
     author_email="tkm45@cornell.edu",
     description="Select module classes and functions using yaml, without any if-statements.",
@@ -19,4 +19,7 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     python_requires='>=3.7',
+    install_requires=[
+      'PyYAML'
+    ],
 )
