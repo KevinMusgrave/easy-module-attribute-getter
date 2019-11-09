@@ -5,11 +5,10 @@ from . import EasyModuleAttributeGetter
 
 class PytorchGetter(EasyModuleAttributeGetter):
     def __init__(self, use_pretrainedmodels_package=False):
+        self.model = [torchvision.models]
         if use_pretrainedmodels_package:
             import pretrainedmodels
-            self.model = [pretrainedmodels]
-        else:
-            self.model = [torchvision.models]
+            self.model += [pretrainedmodels]
         self.loss = [torch.nn]
         self.optimizer = [torch.optim]
         self.lr_scheduler = [torch.optim.lr_scheduler]

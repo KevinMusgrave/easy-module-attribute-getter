@@ -7,10 +7,15 @@ def load_yaml(fname):
     return loaded_yaml
 
 
-def merge_two_dicts(x, y):
-    # https://stackoverflow.com/a/26853961
-    z = x.copy()  # start with x's keys and values
-    z.update(y)  # modifies z with y's keys and values & returns None
+def merge_two_dicts(x, y, curr_depth=0, max_merge_depth=0, only_existing_keys=False):
+    if curr_depth > max_merge_depth:
+        return y
+    z = x.copy()  # start with x's keys and values  
+    for k, v in y.items():  
+        if k in z and isinstance(z[k], dict) and isinstance(y[k], dict):   
+            z[k] = merge_two_dicts(z[k], v, curr_depth+1, max_merge_depth) 
+        elif not only_existing_keys:   
+            z[k] = v    
     return z
 
 
