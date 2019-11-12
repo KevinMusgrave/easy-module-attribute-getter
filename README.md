@@ -67,11 +67,27 @@ subfolder_to_name_dict = {"models": "default", "optimizers": "special_trial", "t
 args, _, _ = yaml_reader.load_yamls(root_path=root_path, subfolder_to_name_dict=subfolder_to_name_dict)
 ```
 
-### Override complex config options via the command line:
-The example yaml file contains 'models' which maps to a nested dictionary. This key can optionally be overridden at the command line, using the standard python notation for nested dictionaries. In this example, instead of loading densenet121 and resnext50, as specified in the config file, the program will instead load googlenet and resnet18.
+### Merge or override complex config options via the command line:
+The example yaml file contains 'models' which maps to a nested dictionary containing modelA and modelB. It's easy to add another key to models at the command line, using the standard python notation for nested dictionaries.
 ```
-python example.py --models {modelA: {googlenet: {pretrained: True}}, modelB: {resnet18: {pretrained: True}}}
+python example.py --models {modelC: {googlenet: {pretrained: True}}}
 ```
+Then in your script:
+```
+import argparse
+yaml_reader = YamlReader(argparse.ArgumentParser())
+args, _, _ = yaml_reader.load_yamls(['example.yaml'], max_merge_depth=1)
+```
+Now args.models contains 3 models.
+
+If in general you'd like to merge config options, then in the load_yamls function, set the max_merge_depth argument to the number of sub-dictionaries you'd like the merge to apply to. 
+
+What if you have max_merge_depth set to 1, but want to do a total override for a particular flag? In that case, just append \~OVERRIDE\~ to the flag:
+```
+python example.py --models~OVERRIDE~ {modelC: {googlenet: {pretrained: True}}}
+```
+Now args.models will contain just modelC, even though max_merge_depth is set to 1. 
+
 
 ### Easily register your own modules into an existing getter.
 ```
