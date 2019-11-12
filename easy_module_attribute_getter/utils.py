@@ -1,4 +1,5 @@
 import yaml
+import re
 
 
 def load_yaml(fname):
@@ -7,15 +8,32 @@ def load_yaml(fname):
     return loaded_yaml
 
 
-def merge_two_dicts(x, y, curr_depth=0, max_merge_depth=0, only_existing_keys=False):
+def merge_two_dicts(x, y, curr_depth=0, max_merge_depth=0, 
+                    only_existing_keys=False, only_non_existing_keys=False,
+                    force_override_key_word='~OVERRIDE~'):
     if curr_depth > max_merge_depth:
         return y
-    z = x.copy()  # start with x's keys and values  
-    for k, v in y.items():  
-        if k in z and isinstance(z[k], dict) and isinstance(y[k], dict):   
-            z[k] = merge_two_dicts(z[k], v, curr_depth+1, max_merge_depth) 
-        elif not only_existing_keys:   
-            z[k] = v    
+    z = x.copy()
+    for k, v in y.items():
+        # override z if the key ends with ~OVERRIDE~
+        if k.endswith(force_override_key_word):
+            new_k = re.sub('\%s$'%force_override_key_word, '', k)
+            y[new_k] = v
+            del y[k]
+            k = new_k
+            force_override = True
+        else:
+            force_override = False
+        # merging 2 subdictionaries  
+        if k in z and isinstance(z[k], dict) and isinstance(y[k], dict):
+            if force_override:
+                z[k] = v
+            else:   
+                z[k] = merge_two_dicts(z[k], v, curr_depth+1, max_merge_depth)   
+        elif (only_existing_keys and k in z) or \
+            (only_non_existing_keys and k not in z) or \
+            (not only_existing_keys and not only_non_existing_keys):   
+            z[k] = v
     return z
 
 

@@ -5,13 +5,13 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="easy_module_attribute_getter",
-    version="0.9.15",
+    version="0.9.16",
     author="Kevin Musgrave",
     author_email="tkm45@cornell.edu",
     description="Select module classes and functions using yaml, without any if-statements.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/TakeshiMusgrave/easy_module_attribute_getter",
+    url="https://github.com/KevinMusgrave/easy_module_attribute_getter",
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
