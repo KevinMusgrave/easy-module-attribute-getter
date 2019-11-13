@@ -1,5 +1,5 @@
 from . import utils as c_f
-
+import logging
 
 class EasyModuleAttributeGetter:
     def get(self, obj_name, class_name=None, params=None, yaml_dict=None, additional_params=None, return_uninitialized=False):
@@ -18,7 +18,7 @@ class EasyModuleAttributeGetter:
                 return uninitialized(**params)
             except BaseException as e:
                 errors.append(e)
-        print(errors)
+        logging.warn(errors)
         raise BaseException
 
     def get_multiple(self, obj_name, yaml_dict, additional_params=None, return_uninitialized=None):
