@@ -7,7 +7,7 @@ pip install easy_module_attribute_getter
 
 ## The Problem: unmaintainable if-statements and switches
 It's common to specify script parameters in yaml config files. For example:
-```
+```yaml
 models:
   modelA:
     densenet121:
@@ -24,7 +24,7 @@ losses:
     L1Loss:
 ```
 Usually, the config file is loaded and then various if-statements or switches are used to instantiate objects etc:
-```
+```python
 if args.models["modelA"] == "densenet121":
   modelA = torchvision.models.densenet121(pretrained = args.pretrained)
 elif args.models["modelA"] == "googlenet":
@@ -42,7 +42,7 @@ elif args.losses["lossA"] == "L1Loss":
 ```
 ## The Solution
 ### Use this package, and get rid of all those annoying if-statements and switches:
-```
+```python
 from easy_module_attribute_getter import PytorchGetter
 pytorch_getter = PytorchGetter()
 models = pytorch_getter.get_multiple("model", args.models)
@@ -51,17 +51,17 @@ losses = pytorch_getter.get_multiple("loss", args.losses)
 "models" and "losses" are dictionaries that map from strings to the desired objects.
 
 ### Load one or multiple yaml files into one args object
-```
+```python
 from easy_module_attribute_getter import YamlReader
 yaml_reader = YamlReader()
 args, _, _ = yaml_reader.load_yamls(['example.yaml'])
 ```
 Provide a list of filepaths:
-```
+```python
 args, _, _ = yaml_reader.load_yamls(['models.yaml', 'optimizers.yaml', 'transforms.yaml'])
 ```
 Or provide a root path and a dictionary mapping subfolder names to the bare filename
-```
+```python
 root_path = "/where/your/yaml/subfolders/are/"
 subfolder_to_name_dict = {"models": "default", "optimizers": "special_trial", "transforms": "blah"}
 args, _, _ = yaml_reader.load_yamls(root_path=root_path, subfolder_to_name_dict=subfolder_to_name_dict)
@@ -73,7 +73,7 @@ The example yaml file contains 'models' which maps to a nested dictionary contai
 python example.py --models {modelC: {googlenet: {pretrained: True}}}
 ```
 Then in your script:
-```
+```python
 import argparse
 yaml_reader = YamlReader(argparse.ArgumentParser())
 args, _, _ = yaml_reader.load_yamls(['example.yaml'], max_merge_depth=1)
@@ -90,7 +90,7 @@ Now args.models will contain just modelC, even though max_merge_depth is set to 
 
 
 ### Easily register your own modules into an existing getter.
-```
+```python
 from pytorch_metric_learning import losses, miners, samplers 
 pytorch_getter = PytorchGetter()
 pytorch_getter.register('loss', losses) 
@@ -105,7 +105,7 @@ In the above example, the 'loss' key already exists, so the 'losses' module will
 ## Pytorch-specific features
 ### Transforms
 Specify transforms in your config file:
-```
+```yaml
 transforms:
   train:
     Resize:
@@ -124,13 +124,13 @@ transforms:
       size: 227
 ```
 Then load composed transforms in your script:
-```
+```python
 transforms = {}
 for k, v in args.transforms.items():
     transforms[k] = pytorch_getter.get_composed_img_transform(v, mean = [0.485, 0.456, 0.406], std = [0.229, 0.224, 0.225])
 ```
 The transforms dict now contains:
-```
+```python
 {'train': Compose(
     Resize(size=256, interpolation=PIL.Image.BILINEAR)
     RandomResizedCrop(size=(227, 227), scale=(0.16, 1), ratio=(0.75, 1.33), interpolation=PIL.Image.BILINEAR)
@@ -148,7 +148,7 @@ The transforms dict now contains:
 
 ### Optimizers, schedulers, and gradient clippers
 Optionally specify the scheduler and gradient clipping norm, within the optimizer parameters.
-```
+```yaml
 optimizers:
   modelA:
     Adam:
@@ -165,7 +165,7 @@ optimizers:
       weight_decay: 0.00005
 ```
 Create the optimizers:
-```
+```python
 optimizers = {}
 schedulers = {}
 grad_clippers = {}
