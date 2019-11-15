@@ -54,7 +54,7 @@ losses = pytorch_getter.get_multiple("loss", args.losses)
 ```python
 from easy_module_attribute_getter import YamlReader
 yaml_reader = YamlReader()
-args, _, _ = yaml_reader.load_yamls(['example.yaml'])
+args, _, _ = yaml_reader.load_yamls(['models.yaml'])
 ```
 Provide a list of filepaths:
 ```python
@@ -76,7 +76,7 @@ Then in your script:
 ```python
 import argparse
 yaml_reader = YamlReader(argparse.ArgumentParser())
-args, _, _ = yaml_reader.load_yamls(['example.yaml'], max_merge_depth=1)
+args, _, _ = yaml_reader.load_yamls(['models.yaml', 'losses.yaml'], max_merge_depth=1)
 ```
 Now args.models contains 3 models.
 
