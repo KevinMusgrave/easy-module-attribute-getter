@@ -17,6 +17,7 @@ grad_clippers = {}
 for k, v in models.items():
 	optimizers[k], schedulers[k], grad_clippers[k] = pytorch_getter.get_optimizer(v, yaml_dict=args.optimizers[k])
 
+print("num_epochs", args.num_epochs)
 print(models.keys())
 print(losses)
 print(transforms)

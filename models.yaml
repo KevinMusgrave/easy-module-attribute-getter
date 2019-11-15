@@ -7,6 +7,8 @@ models:
     resnext50_32x4d:
       pretrained: True
 
+num_epochs: 10
+
 transforms:
   train:
     Resize:

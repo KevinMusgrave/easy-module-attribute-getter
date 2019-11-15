@@ -14,27 +14,28 @@ def merge_two_dicts(x, y, curr_depth=0, max_merge_depth=0,
     if curr_depth > max_merge_depth:
         return y
     z = x.copy()
-    for k, v in y.items():
+    list_of_keys_to_add = []
+    for key, v in y.items():
         # override z if the key ends with ~OVERRIDE~
-        if k.endswith(force_override_key_word):
-            k = re.sub('\%s$'%force_override_key_word, '', k)
-            if k not in z:
-                continue
-            y[k] = v
-            del y[k+force_override_key_word]
+        if key.endswith(force_override_key_word):
+            k = re.sub('\%s$'%force_override_key_word, '', key)
+            list_of_keys_to_add.append(k)
             force_override = True
         else:
+            k = key
             force_override = False
-        # merging 2 subdictionaries  
-        if k in z and isinstance(z[k], dict) and isinstance(y[k], dict):
-            if force_override:
+        if (only_existing_keys and k in z) or (only_non_existing_keys and k not in z) or (not only_existing_keys and not only_non_existing_keys):  
+            # merging 2 subdictionaries  
+            if k in z and isinstance(z[k], dict) and isinstance(v, dict):
+                if force_override:
+                    z[k] = v
+                else:   
+                    z[k] = merge_two_dicts(z[k], v, curr_depth+1, max_merge_depth)   
+            else: 
                 z[k] = v
-            else:   
-                z[k] = merge_two_dicts(z[k], v, curr_depth+1, max_merge_depth)   
-        elif (only_existing_keys and k in z) or \
-            (only_non_existing_keys and k not in z) or \
-            (not only_existing_keys and not only_non_existing_keys):   
-            z[k] = v
+    for key in list_of_keys_to_add:
+        y[key] = v
+        del y[key+force_override_key_word]
     return z
 
 
