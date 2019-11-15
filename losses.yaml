@@ -1,0 +1,5 @@
+losses:
+  lossA:
+    CrossEntropyLoss:
+  lossB:
+    L1Loss:

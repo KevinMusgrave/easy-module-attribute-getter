@@ -7,12 +7,6 @@ models:
     resnext50_32x4d:
       pretrained: True
 
-losses:
-  lossA:
-    CrossEntropyLoss:
-  lossB:
-    L1Loss:
-
 transforms:
   train:
     Resize:

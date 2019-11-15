@@ -17,10 +17,11 @@ def merge_two_dicts(x, y, curr_depth=0, max_merge_depth=0,
     for k, v in y.items():
         # override z if the key ends with ~OVERRIDE~
         if k.endswith(force_override_key_word):
-            new_k = re.sub('\%s$'%force_override_key_word, '', k)
-            y[new_k] = v
-            del y[k]
-            k = new_k
+            k = re.sub('\%s$'%force_override_key_word, '', k)
+            if k not in z:
+                continue
+            y[k] = v
+            del y[k+force_override_key_word]
             force_override = True
         else:
             force_override = False
