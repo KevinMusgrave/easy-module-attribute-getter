@@ -1,5 +1,6 @@
 losses:
   lossA:
     CrossEntropyLoss:
+      ignore_index: 25
   lossB:
     L1Loss:

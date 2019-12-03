@@ -1,15 +1,11 @@
 from easy_module_attribute_getter import YamlReader, PytorchGetter
-import os
 
 yaml_reader = YamlReader()
-args, _, _ = yaml_reader.load_yamls(['models.yaml', 'losses.yaml'], max_merge_depth=1)
 pytorch_getter = PytorchGetter()
+args, _, _ = yaml_reader.load_yamls(['models.yaml', 'losses.yaml'], max_merge_depth=float('inf'))
+
 models = pytorch_getter.get_multiple("model", args.models)
 losses = pytorch_getter.get_multiple("loss", args.losses)
-
-transforms = {}
-for k, v in args.transforms.items():
-    transforms[k] = pytorch_getter.get_composed_img_transform(v, mean = [0.485, 0.456, 0.406], std = [0.229, 0.224, 0.225])
 
 optimizers = {}
 schedulers = {}
@@ -17,13 +13,16 @@ grad_clippers = {}
 for k, v in models.items():
 	optimizers[k], schedulers[k], grad_clippers[k] = pytorch_getter.get_optimizer(v, yaml_dict=args.optimizers[k])
 
-print("num_epochs", args.num_epochs)
+transforms = {}
+for k, v in args.transforms.items():
+    transforms[k] = pytorch_getter.get_composed_img_transform(v, mean = [0.485, 0.456, 0.406], std = [0.229, 0.224, 0.225])
+
 print(models.keys())
 print(losses)
-print(transforms)
 print(optimizers)
 print(schedulers)
 print(grad_clippers)
+print(transforms)
 
 ### the modules I want to add ###
 from pytorch_metric_learning import losses, miners, samplers 
