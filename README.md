@@ -50,6 +50,8 @@ losses = pytorch_getter.get_multiple("loss", args.losses)
 ```
 "models" and "losses" are dictionaries that map from strings to the desired objects.
 
+The nice thing about this package is that if you upgrade to a new version of PyTorch which has 20 new classes, you don't have to change anything. You automatically have access to all the new classes, and you can specify them in your yaml file.
+
 ### Load one or multiple yaml files into one args object
 ```python
 from easy_module_attribute_getter import YamlReader
