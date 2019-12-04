@@ -19,16 +19,18 @@ models:
 ```
 Usually, the config file is loaded and then various if-statements or switches are used to instantiate objects etc. It might look something like this (depending on how the config file is organized):
 ```python
-k = "modelA"
-if args.models[k] == "densenet121":
-  modelA = torchvision.models.densenet121(**args.models[k]["densenet121"])
-elif args.models[k] == "googlenet":
-  modelA = torchvision.models.googlenet(**args.models[k]["googlenet"])
-elif args.models[k] == "resnet50":
-  modelA = torchvision.models.resnet50(**args.models[k]["resnet50"])
-elif args.models[k] == "inception_v3":
-  modelA = torchvision.models.inception_v3(**args.models[k]["inception_v3"])
-...
+models = {}
+for k in ["modelA", "modelB"]:
+	model_name = list(args.models[k].keys())[0]
+	if model_name == "densenet121":
+	  models[k] = torchvision.models.densenet121(**args.models[k][model_name])
+	elif model_name == "googlenet":
+	  models[k] = torchvision.models.googlenet(**args.models[k][model_name])
+	elif model_name == "resnet50":
+	  models[k] = torchvision.models.resnet50(**args.models[k][model_name])
+	elif model_name == "inception_v3":
+	  models[k] = torchvision.models.inception_v3(**args.models[k][model_name])
+	...
 ```
 This is kind of annoying to do, and every time PyTorch adds new classes or functions that you want access to, you need to add new cases to your giant if-statement. An alternative is to make a dictionary:
 ```
@@ -37,13 +39,15 @@ model_dict = {"densenet121": torchvision.models.densenet121,
                       "resnet50": torchvision.models.resnet50,
                       "inception_v3": torchvision.models.inception_v3
 		      ...}
-model_name = args.models["modelA"]
-modelA = model_dict[model_name](**args.models["modelA"][model_name])
+models = {}
+for k in ["modelA", "modelB"]:
+	model_name = model_name = list(args.models[k].keys())[0]
+	models[k] = model_dict[model_name](**args.models[k][model_name])
 ```
 This is shorter than the if statement, but still requires you to manually spell out all the keys and classes. And you still have to update it yourself when the package updates.
 ## The Solution
 ### Fetch and initialize multiple models in one line
-With this package, the above if-statements get reduced to this:
+With this package, the above for-loop and if-statements get reduced to this:
 ```python
 from easy_module_attribute_getter import PytorchGetter
 pytorch_getter = PytorchGetter()
