@@ -180,3 +180,6 @@ grad_clippers = {}
 for k, v in models.items():
 	optimizers[k], schedulers[k], grad_clippers[k] = pytorch_getter.get_optimizer(v, yaml_dict=args.optimizers[k])
 ```
+
+### Not just for PyTorch
+Note that the YamlReader and EasyModuleAttributeGetter classes are totally independent of PyTorch. I wrote the child class PyTorchGetter since that's what I'm using this package for, but the other two classes can be used in general cases and extended for your own purpose.
