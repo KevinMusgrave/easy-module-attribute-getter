@@ -5,7 +5,7 @@
 pip install easy_module_attribute_getter
 ```
 
-## The Problem: unmaintainable if-statements and switches
+## The Problem: unmaintainable if-statements and dictionaries
 It's common to specify script parameters in yaml config files. For example:
 ```yaml
 models:
