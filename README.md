@@ -41,10 +41,11 @@ model_dict = {"densenet121": torchvision.models.densenet121,
 		      ...}
 models = {}
 for k in ["modelA", "modelB"]:
-	model_name = model_name = list(args.models[k].keys())[0]
+	model_name = list(args.models[k].keys())[0]
 	models[k] = model_dict[model_name](**args.models[k][model_name])
 ```
 This is shorter than the if statement, but still requires you to manually spell out all the keys and classes. And you still have to update it yourself when the package updates.
+
 ## The Solution
 ### Fetch and initialize multiple models in one line
 With this package, the above for-loop and if-statements get reduced to this:
@@ -53,7 +54,7 @@ from easy_module_attribute_getter import PytorchGetter
 pytorch_getter = PytorchGetter()
 models = pytorch_getter.get_multiple("model", args.models)
 ```
-"models" is a dictionary that maps from strings to the desired objects, which have already been initialized with the parameters specified in the config file.
+"models" is a dictionary that maps from strings ("modelA" and "modelB") to the desired objects, which have already been initialized with the parameters specified in the config file.
 
 ### Access multiple modules in one line
 Say you want access to the default package (torchvision.models), as well as the pretrainedmodels package, and two other custom model modules, X and Y. You can register these:
@@ -67,6 +68,7 @@ Now you can still do the 1-liner:
 models = pytorch_getter.get_multiple("model", args.models)
 ```
 And pytorch_getter will try all 4 registered modules until it gets a match.
+
 ### Automatically have yaml access to new classes
 If you upgrade to a new version of PyTorch which has 20 new classes, you don't have to change anything. You automatically have access to all the new classes, and you can specify them in your yaml file.
 
