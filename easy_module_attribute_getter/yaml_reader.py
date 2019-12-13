@@ -7,10 +7,11 @@ from io import StringIO
 
 
 class YamlReader:
-    def __init__(self, argparser=None):
+    def __init__(self, argparser=None, force_override_key_word="~OVERRIDE~"):
         self.argparser = argparser if argparser is not None else argparse.ArgumentParser()
         self.args, self.unknown_args = self.argparser.parse_known_args()
         self.add_unknown_args()
+        self.force_override_key_word = force_override_key_word
 
     def add_unknown_args(self):
         curr_flag = None
@@ -43,9 +44,10 @@ class YamlReader:
         else:
             path_list = ['%s/%s/%s.yaml' % (root_path, k, v) for k, v in subfolder_to_name_dict.items()]
         for c in path_list:
-            curr_yaml = c_f.merge_two_dicts(c_f.load_yaml(c), self.args.__dict__, max_merge_depth=max_merge_depth, only_existing_keys=True)
+            curr_yaml = c_f.merge_two_dicts(c_f.load_yaml(c), self.args.__dict__, max_merge_depth=max_merge_depth, only_existing_keys=True, force_override_key_word=self.force_override_key_word)
             self.dict_of_yamls[c] = curr_yaml
-            self.loaded_yaml = c_f.merge_two_dicts(self.loaded_yaml, curr_yaml, max_merge_depth=max_merge_depth)
-        self.args = c_f.merge_two_dicts(self.loaded_yaml, self.args.__dict__, max_merge_depth=max_merge_depth, only_non_existing_keys=True)
+            self.loaded_yaml = c_f.merge_two_dicts(self.loaded_yaml, curr_yaml, max_merge_depth=max_merge_depth, force_override_key_word=self.force_override_key_word)
+        c_f.remove_override_key_word(self.args.__dict__, self.force_override_key_word)
+        self.args = c_f.merge_two_dicts(self.loaded_yaml, self.args.__dict__, max_merge_depth=max_merge_depth, only_non_existing_keys=True, force_override_key_word=self.force_override_key_word)
         self.args = SimpleNamespace(**self.args)
         return self.args, self.loaded_yaml, self.dict_of_yamls
