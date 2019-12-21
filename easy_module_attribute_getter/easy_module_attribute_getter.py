@@ -30,6 +30,7 @@ class EasyModuleAttributeGetter:
                                  return_uninitialized=return_uninitialized)
         return output
 
-    def register(self, obj_name, new_module):
+    def register(self, obj_name, new_module, prepend=True):
         curr = getattr(self, obj_name) if hasattr(self, obj_name) else []
-        setattr(self, obj_name, [new_module] + curr)
+        module_list = [new_module] + curr if prepend else curr + [new_module]
+        setattr(self, obj_name, module_list)
