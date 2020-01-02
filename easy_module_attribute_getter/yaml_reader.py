@@ -47,7 +47,7 @@ class YamlReader:
             curr_yaml = c_f.merge_two_dicts(c_f.load_yaml(c), self.args.__dict__, max_merge_depth=max_merge_depth, only_existing_keys=True, force_override_key_word=self.force_override_key_word)
             self.dict_of_yamls[c] = curr_yaml
             self.loaded_yaml = c_f.merge_two_dicts(self.loaded_yaml, curr_yaml, max_merge_depth=max_merge_depth, force_override_key_word=self.force_override_key_word)
-        c_f.remove_override_key_word(self.args.__dict__, self.force_override_key_word)
+        c_f.remove_key_word(self.args.__dict__, self.force_override_key_word)
         self.args = c_f.merge_two_dicts(self.loaded_yaml, self.args.__dict__, max_merge_depth=max_merge_depth, only_non_existing_keys=True, force_override_key_word=self.force_override_key_word)
         self.args = SimpleNamespace(**self.args)
         return self.args, self.loaded_yaml, self.dict_of_yamls

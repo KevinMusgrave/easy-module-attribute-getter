@@ -33,14 +33,15 @@ def merge_two_dicts(x, y, curr_depth=0, max_merge_depth=0,
                 z[k] = v
     return z
 
-def remove_override_key_word(input_dict, override_key_word):
+def remove_key_word(input_dict, key_word):
     override_list = []
     for key, v in input_dict.items():
-        if key.endswith(override_key_word):
-            k = re.sub('\%s$'%override_key_word, '', key)
+        if key.endswith(key_word):
+            k = re.sub('\%s$'%key_word, '', key)
             override_list.append((k,v))
     for (k, v) in override_list:
         input_dict[k] = v
+        input_dict.pop(k+key_word, None)
 
 def string_to_num(s):
     """
