@@ -1,8 +1,8 @@
-# easy_module_attribute_getter
+# easy-module-attribute-getter
 
 ## Installation
 ```
-pip install easy_module_attribute_getter
+pip install easy-module-attribute-getter
 ```
 
 ## The Problem: unmaintainable if-statements and dictionaries
