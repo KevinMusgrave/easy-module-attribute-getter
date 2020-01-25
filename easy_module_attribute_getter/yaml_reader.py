@@ -4,6 +4,7 @@ from . import utils as c_f
 import re
 import yaml
 from io import StringIO
+import os
 
 
 class YamlReader:
@@ -42,7 +43,7 @@ class YamlReader:
         if config_paths:
             path_list = config_paths
         else:
-            path_list = ['%s/%s/%s.yaml' % (root_path, k, v) for k, v in subfolder_to_name_dict.items()]
+            path_list = [os.path.join(root_path, k, '%s.yaml'%v) for k, v in subfolder_to_name_dict.items()]
         for c in path_list:
             curr_yaml = c_f.merge_two_dicts(c_f.load_yaml(c), self.args.__dict__, max_merge_depth=max_merge_depth, only_existing_keys=True, force_override_key_word=self.force_override_key_word)
             self.dict_of_yamls[c] = curr_yaml
