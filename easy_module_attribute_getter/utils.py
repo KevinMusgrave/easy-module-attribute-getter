@@ -43,6 +43,13 @@ def remove_key_word(input_dict, key_word):
         input_dict[k] = v
         input_dict.pop(k+key_word, None)
 
+def remove_key_word_recursively(args_dict, keyword):
+    for v in args_dict.values():
+        if isinstance(v, dict):
+            remove_key_word(v, keyword)
+            remove_key_word_recursively(v, keyword)
+    remove_key_word(args_dict, keyword)
+
 def string_to_num(s):
     """
     If input is not a string, then return input.
