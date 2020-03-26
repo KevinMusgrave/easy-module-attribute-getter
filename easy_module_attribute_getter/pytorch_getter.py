@@ -14,6 +14,7 @@ class PytorchGetter(EasyModuleAttributeGetter):
         self.lr_scheduler = [torch.optim.lr_scheduler]
         self.transform = [custom_transforms, torchvision.transforms.transforms]
         self.dataset = [torchvision.datasets]
+        self.sampler = [torch.utils.data]
 
     # modified from https://github.com/meetshah1995/pytorch-semseg  
     def get_composed_transform(self, transform_dict):

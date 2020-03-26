@@ -1,5 +1,6 @@
 from . import utils as c_f
 import logging
+import inspect
 
 class EasyModuleAttributeGetter:
     def get(self, obj_name, class_name=None, params=None, yaml_dict=None, additional_params=None, return_uninitialized=False):
@@ -12,13 +13,16 @@ class EasyModuleAttributeGetter:
             if additional_params is not None:
                 params = c_f.merge_two_dicts(params, additional_params)
             try:
-                uninitialized = getattr(module, class_name)
+                if inspect.ismodule(module):
+                    uninitialized = getattr(module, class_name)
+                elif inspect.isclass(module):
+                    uninitialized = module
                 if return_uninitialized:
                     return uninitialized, params
                 return uninitialized(**params)
             except BaseException as e:
                 errors.append(e)
-        logging.warn(errors)
+        logging.error(errors)
         raise BaseException
 
     def get_multiple(self, obj_name, yaml_dict, additional_params=None, return_uninitialized=None):
@@ -31,6 +35,7 @@ class EasyModuleAttributeGetter:
         return output
 
     def register(self, obj_name, new_module, prepend=True):
+        assert inspect.ismodule(new_module) or inspect.isclass(new_module)
         curr = getattr(self, obj_name) if hasattr(self, obj_name) else []
         module_list = [new_module] + curr if prepend else curr + [new_module]
         setattr(self, obj_name, module_list)
