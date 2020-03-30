@@ -20,10 +20,10 @@ class EasyModuleAttributeGetter:
                 if return_uninitialized:
                     return uninitialized, params
                 return uninitialized(**params)
-            except BaseException as e:
+            except AttributeError as e:
                 errors.append(e)
         logging.error(errors)
-        raise BaseException
+        raise AttributeError
 
     def get_multiple(self, obj_name, yaml_dict, additional_params=None, return_uninitialized=None):
         output = {}

@@ -60,10 +60,10 @@ def string_to_num(s):
         return s
     try:
         return int(s)
-    except BaseException:
+    except ValueError:
         try:
             return float(s)
-        except BaseException:
+        except ValueError:
             return s
 
 
@@ -81,7 +81,7 @@ def try_convert_to_list_of_numbers(transform_params):
             v = [string_to_num(x) for x in v.split(" ")]
             if len(v) == 1:
                 v = v[0]
-        except BaseException:
+        except AttributeError:
             v = string_to_num(v)
         transform_params[k] = v
     return transform_params
