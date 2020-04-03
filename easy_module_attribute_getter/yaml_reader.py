@@ -11,7 +11,8 @@ class YamlReader:
     def __init__(self, argparser=None, force_override_key_word="~OVERRIDE~"):
         self.argparser = argparser if argparser is not None else argparse.ArgumentParser()
         self.args, self.unknown_args = self.argparser.parse_known_args()
-        self.add_unknown_args()
+        if argparser is not None:
+            self.add_unknown_args()
         self.force_override_key_word = force_override_key_word
 
     def add_unknown_args(self):

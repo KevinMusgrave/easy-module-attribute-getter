@@ -41,17 +41,15 @@ class PytorchGetter(EasyModuleAttributeGetter):
     def get_optimizer(self, input_model, class_name=None, params=None, yaml_dict=None):
         optimizer, scheduler, grad_clipper = None, None, None
         model_parameters = input_model.parameters()
-        optimizer_class, opt_dict = self.get(
+        scheduler_type = yaml_dict.pop("scheduler", None)
+        clip_grad_norm = yaml_dict.pop("clip_grad_norm", None)
+        optimizer = self.get(
             "optimizer", 
             class_name=class_name, 
             params=params, 
             yaml_dict=yaml_dict,
             additional_params={"params":model_parameters},
-            return_uninitialized=True
         )
-        scheduler_type = opt_dict.pop("scheduler", None)
-        clip_grad_norm = opt_dict.pop("clip_grad_norm", None)
-        optimizer = optimizer_class(**opt_dict)
 
         if scheduler_type is not None:
             scheduler = self.get("lr_scheduler", yaml_dict=scheduler_type, additional_params={"optimizer": optimizer})
