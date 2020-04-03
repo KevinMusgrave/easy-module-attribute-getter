@@ -31,11 +31,11 @@ optimizers:
     Adam:
       lr: 0.00001
       weight_decay: 0.00005
-      scheduler:
-        StepLR:
-          step_size: 2
-          gamma: 0.95
-      clip_grad_norm: 1
+    scheduler:
+      StepLR:
+        step_size: 2
+        gamma: 0.95
+    clip_grad_norm: 1
   modelB:
     Adam:
       lr: 0.00001
