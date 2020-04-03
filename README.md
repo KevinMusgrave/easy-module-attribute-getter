@@ -162,11 +162,11 @@ optimizers:
     Adam:
       lr: 0.00001
       weight_decay: 0.00005
-      scheduler:
-        StepLR:
-          step_size: 2
-          gamma: 0.95
-      clip_grad_norm: 1
+    scheduler:
+      StepLR:
+        step_size: 2
+        gamma: 0.95
+    clip_grad_norm: 1
   modelB:
     RMSprop:
       lr: 0.00001
@@ -181,5 +181,5 @@ for k, v in models.items():
 	optimizers[k], schedulers[k], grad_clippers[k] = pytorch_getter.get_optimizer(v, yaml_dict=args.optimizers[k])
 ```
 
-### Not just for PyTorch
+## Not just for PyTorch
 Note that the YamlReader and EasyModuleAttributeGetter classes are totally independent of PyTorch. I wrote the child class PyTorchGetter since that's what I'm using this package for, but the other two classes can be used in general cases and extended for your own purpose.
