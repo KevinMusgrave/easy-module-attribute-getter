@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="easy-module-attribute-getter",
-    version="0.9.32",
+    version="0.9.33",
     author="Kevin Musgrave",
     author_email="tkm45@cornell.edu",
     description="Select module classes and functions using yaml, without any if-statements.",

@@ -15,8 +15,10 @@ class EasyModuleAttributeGetter:
             try:
                 if inspect.ismodule(module):
                     uninitialized = getattr(module, class_name)
-                elif inspect.isclass(module):
+                elif inspect.isclass(module) and module.__name__ == class_name:
                     uninitialized = module
+                else:
+                    raise AttributeError("%s does not match %s"%(module, class_name))
                 if return_uninitialized:
                     return uninitialized, params
                 return uninitialized(**params)
