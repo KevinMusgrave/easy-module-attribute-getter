@@ -156,19 +156,25 @@ The transforms dict now contains:
 
 ### Optimizers, schedulers, and gradient clippers
 Optionally specify the scheduler and gradient clipping norm, within the optimizer parameters.
+
+The scheduler keys should be one of ```scheduler_by_epoch```, ```scheduler_by_iteration```, and ```scheduler_by_plateau```.
+
 ```yaml
 optimizers:
   modelA:
     Adam:
       lr: 0.00001
       weight_decay: 0.00005
-    scheduler:
+    scheduler_by_epoch:
       StepLR:
         step_size: 2
         gamma: 0.95
+    scheduler_by_iteration:
+      ExponentialLR:
+        gamma: 0.99
     clip_grad_norm: 1
   modelB:
-    RMSprop:
+    Adam:
       lr: 0.00001
       weight_decay: 0.00005
 ```
