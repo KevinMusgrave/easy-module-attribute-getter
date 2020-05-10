@@ -9,7 +9,7 @@ import os
 
 class YamlReader:
     def __init__(self, argparser=None, force_override_key_word="~OVERRIDE~"):
-        self.argparser = argparser if argparser is not None else argparse.ArgumentParser()
+        self.argparser = argparser if argparser is not None else argparse.ArgumentParser(allow_abbrev=False)
         self.args, self.unknown_args = self.argparser.parse_known_args()
         if argparser is not None:
             self.add_unknown_args()
