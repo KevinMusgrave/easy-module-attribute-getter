@@ -7,10 +7,13 @@ def load_yaml(fname):
         loaded_yaml = yaml.safe_load(f)
     return loaded_yaml
 
+def all_are_dicts(list_of_candidates):
+    return all(isinstance(x, dict) for x in list_of_candidates)
+
 
 def merge_two_dicts(x, y, curr_depth=0, max_merge_depth=0, 
                     only_existing_keys=False, only_non_existing_keys=False,
-                    force_override_key_word='~OVERRIDE~'):
+                    force_override_key_word='~OVERRIDE~', merge_nested_dicts=True):
     if curr_depth > max_merge_depth:
         return y
     z = x.copy()
@@ -22,9 +25,11 @@ def merge_two_dicts(x, y, curr_depth=0, max_merge_depth=0,
         else:
             k = key
             force_override = False
+        if (not merge_nested_dicts) and (k in z) and all_are_dicts([z[k], v]):
+            continue
         if (only_existing_keys and k in z) or (only_non_existing_keys and k not in z) or (not only_existing_keys and not only_non_existing_keys):  
             # merging 2 subdictionaries  
-            if k in z and isinstance(z[k], dict) and isinstance(v, dict):
+            if (k in z) and all_are_dicts([z[k], v]):
                 if force_override:
                     z[k] = v
                 else:   

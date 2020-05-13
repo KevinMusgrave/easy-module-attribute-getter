@@ -38,7 +38,7 @@ class YamlReader:
                     setattr(self.args, curr_flag, yaml.load(StringIO(u), yaml.SafeLoader))
                     curr_flag = None
 
-    def load_yamls(self, config_paths=None, root_path=None, subfolder_to_name_dict=None, max_merge_depth=0, merge_argparse=True):
+    def load_yamls(self, config_paths=None, root_path=None, subfolder_to_name_dict=None, max_merge_depth=0, merge_argparse=True, merge_nested_dicts=True):
         self.loaded_yaml = {}
         self.dict_of_yamls = {}
         if config_paths:
@@ -48,10 +48,24 @@ class YamlReader:
         for c in path_list:
             curr_yaml = c_f.load_yaml(c)
             if merge_argparse:
-                curr_yaml = c_f.merge_two_dicts(curr_yaml, self.args.__dict__, max_merge_depth=max_merge_depth, only_existing_keys=True, force_override_key_word=self.force_override_key_word)
+                curr_yaml = c_f.merge_two_dicts(curr_yaml, 
+                                                self.args.__dict__, 
+                                                max_merge_depth=max_merge_depth, 
+                                                only_existing_keys=True, 
+                                                force_override_key_word=self.force_override_key_word,
+                                                merge_nested_dicts=merge_nested_dicts)
             self.dict_of_yamls[c] = curr_yaml
-            self.loaded_yaml = c_f.merge_two_dicts(self.loaded_yaml, curr_yaml, max_merge_depth=max_merge_depth, force_override_key_word=self.force_override_key_word)
+            self.loaded_yaml = c_f.merge_two_dicts(self.loaded_yaml, 
+                                                    curr_yaml, 
+                                                    max_merge_depth=max_merge_depth, 
+                                                    force_override_key_word=self.force_override_key_word,
+                                                    merge_nested_dicts=merge_nested_dicts)
         c_f.remove_key_word_recursively(self.args.__dict__, self.force_override_key_word)
-        self.args = c_f.merge_two_dicts(self.loaded_yaml, self.args.__dict__, max_merge_depth=max_merge_depth, only_non_existing_keys=True, force_override_key_word=self.force_override_key_word)
+        self.args = c_f.merge_two_dicts(self.loaded_yaml, 
+                                        self.args.__dict__, 
+                                        max_merge_depth=max_merge_depth, 
+                                        only_non_existing_keys=True, 
+                                        force_override_key_word=self.force_override_key_word,
+                                        merge_nested_dicts=merge_nested_dicts)
         self.args = SimpleNamespace(**self.args)
         return self.args, self.loaded_yaml, self.dict_of_yamls
