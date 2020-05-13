@@ -10,10 +10,9 @@ def load_yaml(fname):
 def all_are_dicts(list_of_candidates):
     return all(isinstance(x, dict) for x in list_of_candidates)
 
-
 def merge_two_dicts(x, y, curr_depth=0, max_merge_depth=0, 
                     only_existing_keys=False, only_non_existing_keys=False,
-                    force_override_key_word='~OVERRIDE~', merge_nested_dicts=True):
+                    force_override_key_word='~OVERRIDE~'):
     if curr_depth > max_merge_depth:
         return y
     z = x.copy()
@@ -25,8 +24,6 @@ def merge_two_dicts(x, y, curr_depth=0, max_merge_depth=0,
         else:
             k = key
             force_override = False
-        if (not merge_nested_dicts) and (k in z) and all_are_dicts([z[k], v]):
-            continue
         if (only_existing_keys and k in z) or (only_non_existing_keys and k not in z) or (not only_existing_keys and not only_non_existing_keys):  
             # merging 2 subdictionaries  
             if (k in z) and all_are_dicts([z[k], v]):
@@ -38,6 +35,7 @@ def merge_two_dicts(x, y, curr_depth=0, max_merge_depth=0,
                 z[k] = v
     return z
 
+
 def remove_key_word(input_dict, key_word):
     override_list = []
     for key, v in input_dict.items():
@@ -48,12 +46,23 @@ def remove_key_word(input_dict, key_word):
         input_dict[k] = v
         input_dict.pop(k+key_word, None)
 
+
 def remove_key_word_recursively(args_dict, keyword):
     for v in args_dict.values():
         if isinstance(v, dict):
             remove_key_word(v, keyword)
             remove_key_word_recursively(v, keyword)
     remove_key_word(args_dict, keyword)
+
+
+def remove_dicts(args_dict):
+    remove_list = []
+    for key, v in args_dict.items():
+        if isinstance(v, dict):
+            remove_list.append(key)
+    for k in remove_list:
+        args_dict.pop(k)
+
 
 def string_to_num(s):
     """
