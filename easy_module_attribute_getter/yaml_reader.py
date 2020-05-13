@@ -61,26 +61,27 @@ class YamlReader:
                     setattr(self.args, curr_flag, yaml.load(StringIO(u), yaml.SafeLoader))
                     curr_flag = None
 
-    def load_yamls(self, config_paths=None, root_path=None, subfolder_to_name_dict=None, max_merge_depth=0, merge_argparse=True):
-        self.loaded_yaml = {}
-        self.dict_of_yamls = {}
-        if config_paths:
-            path_list = config_paths
-        else:
-            path_list = [os.path.join(root_path, k, '%s.yaml'%v) for k, v in subfolder_to_name_dict.items()]
-        for c in path_list:
-            curr_yaml = c_f.load_yaml(c)
-            if merge_argparse:
-                curr_yaml = c_f.merge_two_dicts(curr_yaml, 
-                                                self.args.__dict__, 
-                                                max_merge_depth=max_merge_depth, 
-                                                only_existing_keys=True, 
-                                                force_override_key_word=self.force_override_key_word)
-            self.dict_of_yamls[c] = curr_yaml
-            self.loaded_yaml = c_f.merge_two_dicts(self.loaded_yaml, 
-                                                    curr_yaml, 
+    def load_yamls(self, config_paths=None, root_path=None, max_merge_depth=0, merge_argparse=True):
+        self.dict_of_yamls = defaultdict(dict)
+        for config_name, config_list in config_paths.items():
+            for c in config_list:
+                curr_yaml = c_f.load_yaml(c)
+                if merge_argparse:
+                    curr_yaml = c_f.merge_two_dicts(curr_yaml, 
+                                                    self.args.__dict__, 
                                                     max_merge_depth=max_merge_depth, 
+                                                    only_existing_keys=True, 
                                                     force_override_key_word=self.force_override_key_word)
+
+                self.dict_of_yamls[config_name] = c_f.merge_two_dicts(self.dict_of_yamls[config_name], 
+                                                                        curr_yaml, 
+                                                                        max_merge_depth=max_merge_depth,
+                                                                        force_override_key_word=self.force_override_key_word)
+        
+        self.loaded_yaml = {}
+        for config in self.dict_of_yamls.values():
+            self.loaded_yaml = c_f.merge_two_dicts(self.loaded_yaml, config, max_merge_depth=0)
+
         c_f.remove_key_word_recursively(self.args.__dict__, self.force_override_key_word)
         self.args = c_f.merge_two_dicts(self.loaded_yaml, 
                                         self.args.__dict__, 
