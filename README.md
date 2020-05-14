@@ -81,7 +81,7 @@ Then in your script:
 ```python
 import argparse
 yaml_reader = YamlReader(argparse.ArgumentParser())
-args, _, _ = yaml_reader.load_yamls(['models.yaml', 'losses.yaml'], max_merge_depth=1)
+args, _, _ = yaml_reader.load_yamls({"models": ['models.yaml'], "losses": ['losses.yaml']}, max_merge_depth=float('inf'))
 ```
 Now args.models contains 3 models.
 
