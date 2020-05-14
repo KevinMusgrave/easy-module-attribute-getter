@@ -2,7 +2,7 @@ from easy_module_attribute_getter import YamlReader, PytorchGetter
 
 yaml_reader = YamlReader()
 pytorch_getter = PytorchGetter()
-args, _, _ = yaml_reader.load_yamls(['models.yaml', 'losses.yaml'], max_merge_depth=float('inf'))
+args, _, _ = yaml_reader.load_yamls({"models": ['models.yaml'], "losses": ['losses.yaml']}, max_merge_depth=float('inf'))
 
 models = pytorch_getter.get_multiple("model", args.models)
 losses = pytorch_getter.get_multiple("loss", args.losses)
