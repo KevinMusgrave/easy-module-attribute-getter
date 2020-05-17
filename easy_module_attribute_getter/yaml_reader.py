@@ -21,11 +21,9 @@ class YamlReader:
         char_counts = defaultdict(int)
         colon_followed_by_char = re.compile(":[\s\S]")
         error_message = ""
-        syntax_error = False
         for u in self.unknown_args:
             colon_error = colon_followed_by_char.search(u)
             if colon_error:
-                syntax_error = True
                 error_message += "There must be a space after the colon in this expression: \"{}\"\n".format(u)
             for char in ['{', '}', '[', ']', '(', ')']:
                 char_counts[char] += u.count(char)
@@ -33,33 +31,57 @@ class YamlReader:
         for opener, closer in should_be_balanced:
             num_openers, num_closers = char_counts[opener], char_counts[closer]
             if num_openers != num_closers:
-                syntax_error = True
                 error_message += "Command line bracket imbalance: {} of {} and {} of {}\n".format(num_openers, opener, num_closers, closer)
-        if syntax_error:
+        error_message += self.add_unknown_args(dummy_run=True)       
+        if error_message != "":
             raise ValueError(error_message)
-        
-    def add_unknown_args(self):
+
+    def bracket_parser(self, B, curr_flag, in_str, dummy_run=False):
+        # B is the bracket dict
+        attribute_is_set = False
+        B["depth"] += in_str.count(B["opener"]) - in_str.count(B["closer"])
+        B["is_start"] = in_str[0] == B["opener"]
+        B["is_end"] = in_str[-1] == B["closer"]
+        if B["is_start"] or B["is_end"] or (B["curr_value"] != ''):
+            B["curr_value"] += ' %s' % in_str
+        if B["is_end"] and B["depth"] == 0:
+            if not dummy_run:
+                setattr(self.args, curr_flag, yaml.load(StringIO(B["curr_value"]), yaml.SafeLoader))
+            B["curr_value"] = ''
+            curr_flag = None
+            attribute_is_set = True
+        return attribute_is_set, curr_flag
+
+
+    def add_unknown_args(self, dummy_run=False):
+        error_message = ""
         curr_flag = None
-        curr_dictionary = ''
-        dictionary_depth = 0
+        depths = {"dict": {"opener": "{", "closer": "}", "depth": 0, "is_start": False, "is_end": False, "curr_value": ''}, 
+                "list": {"opener": "[", "closer": "]", "depth": 0, "is_start": False, "is_end": False, "curr_value": ''}}
+        D = depths["dict"]
+        L = depths["list"]
         for u in self.unknown_args:
             if re.match("^--[a-zA-Z]", u) is not None:
                 curr_flag = u[2:]
-                setattr(self.args, curr_flag, True)
+                if not dummy_run:
+                    setattr(self.args, curr_flag, True)
             else:
-                dictionary_depth += u.count('{') - u.count('}')
-                is_start = u[0] == '{'
-                is_end = u[-1] == '}'
-                if (is_start or is_end) or (curr_dictionary != ''):
-                    curr_dictionary += ' %s' % u
-                if is_end and dictionary_depth == 0:
-                    setattr(self.args, curr_flag, yaml.load(StringIO(curr_dictionary), yaml.SafeLoader))
-                    curr_dictionary = ''
+                if L["curr_value"] == '':
+                    attribute_is_set, curr_flag = self.bracket_parser(D, curr_flag, u, dummy_run)
+                    if attribute_is_set:
+                        continue
+                if D["curr_value"] == '':
+                    attribute_is_set, curr_flag = self.bracket_parser(L, curr_flag, u, dummy_run)
+                    if attribute_is_set:
+                        continue
+                if (L["curr_value"] == '') and (D["curr_value"] == ''):
+                    if not dummy_run:
+                        setattr(self.args, curr_flag, yaml.load(StringIO(u), yaml.SafeLoader))
+                    elif curr_flag == None:
+                        error_message += "{} is missing \"--\" in front of it. If you meant to pass in a list, use standard python list notation.\n".format(u) 
                     curr_flag = None
-                # flag argument and not part of dictionary
-                elif curr_dictionary == '':
-                    setattr(self.args, curr_flag, yaml.load(StringIO(u), yaml.SafeLoader))
-                    curr_flag = None
+        return error_message
+
 
     def load_yamls(self, config_paths=None, root_path=None, max_merge_depth=0, merge_argparse=True):
         self.dict_of_yamls = defaultdict(dict)
@@ -89,4 +111,5 @@ class YamlReader:
                                         only_non_existing_keys=True, 
                                         force_override_key_word=self.force_override_key_word)
         self.args = SimpleNamespace(**self.args)
+
         return self.args, self.loaded_yaml, self.dict_of_yamls
