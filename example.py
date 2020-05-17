@@ -1,4 +1,6 @@
 from easy_module_attribute_getter import YamlReader, PytorchGetter
+import easy_module_attribute_getter
+print("VERSION={}".format(easy_module_attribute_getter.__version__))
 
 yaml_reader = YamlReader()
 pytorch_getter = PytorchGetter()
