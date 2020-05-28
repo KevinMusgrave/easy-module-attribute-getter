@@ -1,4 +1,4 @@
-__version__ = "0.9.37"
+__version__ = "0.9.38"
 import logging
 from .yaml_reader import YamlReader
 from .easy_module_attribute_getter import EasyModuleAttributeGetter

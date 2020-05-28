@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="easy-module-attribute-getter",
-    version="0.9.37",
+    version="0.9.38",
     author="Kevin Musgrave",
     author_email="tkm45@cornell.edu",
     description="Select module classes and functions using yaml, without any if-statements.",
@@ -20,6 +20,7 @@ setuptools.setup(
     ],
     python_requires='>=3.0',
     install_requires=[
-      'PyYAML'
+      'PyYAML >= 5.3.1',
+      'torchvision >= 0.4.0'
     ],
 )

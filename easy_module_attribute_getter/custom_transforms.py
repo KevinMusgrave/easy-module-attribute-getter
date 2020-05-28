@@ -15,6 +15,9 @@ class ConvertToBGR(object):
         img = Image.merge("RGB", (b, g, r))
         return img
 
+    def __repr__(self):
+        return "{}()".format(self.__class__.__name__)
+
 
 class Multiplier(object):
     def __init__(self, multiple):
@@ -22,3 +25,6 @@ class Multiplier(object):
 
     def __call__(self, img):
         return img*self.multiple
+
+    def __repr__(self):
+        return "{}(multiple={})".format(self.__class__.__name__, self.multiple)
