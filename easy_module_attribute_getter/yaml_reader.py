@@ -9,13 +9,18 @@ from collections import defaultdict
 
 
 class YamlReader:
-    def __init__(self, argparser=None, force_override_key_word="~OVERRIDE~"):
+    def __init__(self, argparser=None, 
+                force_override_key_word="~OVERRIDE~", 
+                apply_key_word="~APPLY~",
+                delete_key_word = "~DELETE~"):
         self.argparser = argparser if argparser is not None else argparse.ArgumentParser(allow_abbrev=False)
         self.args, self.unknown_args = self.argparser.parse_known_args()
         if argparser is not None:
             self.validate_command_line_input()
             self.add_unknown_args()
         self.force_override_key_word = force_override_key_word
+        self.apply_key_word = apply_key_word
+        self.delete_key_word = delete_key_word
 
     def validate_command_line_input(self):
         char_counts = defaultdict(int)
@@ -93,23 +98,31 @@ class YamlReader:
                                                     self.args.__dict__, 
                                                     max_merge_depth=max_merge_depth, 
                                                     only_existing_keys=True, 
-                                                    force_override_key_word=self.force_override_key_word)
+                                                    force_override_key_word=self.force_override_key_word,
+                                                    apply_key_word=self.apply_key_word,
+                                                    delete_key_word=self.delete_key_word)
 
                 self.dict_of_yamls[config_name] = c_f.merge_two_dicts(self.dict_of_yamls[config_name], 
                                                                         curr_yaml, 
                                                                         max_merge_depth=max_merge_depth,
-                                                                        force_override_key_word=self.force_override_key_word)
+                                                                        force_override_key_word=self.force_override_key_word,
+                                                                        apply_key_word=self.apply_key_word,
+                                                                        delete_key_word=self.delete_key_word)
         
         self.loaded_yaml = {}
         for config in self.dict_of_yamls.values():
             self.loaded_yaml = c_f.merge_two_dicts(self.loaded_yaml, config, max_merge_depth=0)
 
-        c_f.remove_key_word_recursively(self.args.__dict__, self.force_override_key_word)
+        for key_word in [self.force_override_key_word, self.apply_key_word, self.delete_key_word]:
+            c_f.remove_key_word_recursively(self.args.__dict__, key_word)
+
         self.args = c_f.merge_two_dicts(self.loaded_yaml, 
                                         self.args.__dict__, 
                                         max_merge_depth=max_merge_depth, 
                                         only_non_existing_keys=True, 
-                                        force_override_key_word=self.force_override_key_word)
+                                        force_override_key_word=self.force_override_key_word,
+                                        apply_key_word=self.apply_key_word,
+                                        delete_key_word=self.delete_key_word)
         self.args = SimpleNamespace(**self.args)
 
         return self.args, self.loaded_yaml, self.dict_of_yamls
