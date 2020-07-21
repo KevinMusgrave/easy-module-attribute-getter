@@ -88,26 +88,27 @@ class YamlReader:
         return error_message
 
 
-    def load_yamls(self, config_paths=None, root_path=None, max_merge_depth=0, merge_argparse=True):
+    def load_yamls(self, config_paths=None, root_path=None, max_merge_depth=0,  max_argparse_merge_depth=0, merge_argparse=True):
         self.dict_of_yamls = defaultdict(dict)
         for config_name, config_list in config_paths.items():
             for c in config_list:
                 curr_yaml = c_f.load_yaml(c)
+                curr_yaml = c_f.merge_two_dicts(self.dict_of_yamls[config_name], 
+                                                curr_yaml, 
+                                                max_merge_depth=max_merge_depth,
+                                                force_override_key_word=self.force_override_key_word,
+                                                apply_key_word=self.apply_key_word,
+                                                delete_key_word=self.delete_key_word)
                 if merge_argparse:
                     curr_yaml = c_f.merge_two_dicts(curr_yaml, 
                                                     self.args.__dict__, 
-                                                    max_merge_depth=max_merge_depth, 
+                                                    max_merge_depth=max_argparse_merge_depth, 
                                                     only_existing_keys=True, 
                                                     force_override_key_word=self.force_override_key_word,
                                                     apply_key_word=self.apply_key_word,
                                                     delete_key_word=self.delete_key_word)
 
-                self.dict_of_yamls[config_name] = c_f.merge_two_dicts(self.dict_of_yamls[config_name], 
-                                                                        curr_yaml, 
-                                                                        max_merge_depth=max_merge_depth,
-                                                                        force_override_key_word=self.force_override_key_word,
-                                                                        apply_key_word=self.apply_key_word,
-                                                                        delete_key_word=self.delete_key_word)
+                self.dict_of_yamls[config_name] = curr_yaml
         
         self.loaded_yaml = {}
         for config in self.dict_of_yamls.values():
@@ -118,7 +119,7 @@ class YamlReader:
 
         self.args = c_f.merge_two_dicts(self.loaded_yaml, 
                                         self.args.__dict__, 
-                                        max_merge_depth=max_merge_depth, 
+                                        max_merge_depth=max_argparse_merge_depth, 
                                         only_non_existing_keys=True, 
                                         force_override_key_word=self.force_override_key_word,
                                         apply_key_word=self.apply_key_word,

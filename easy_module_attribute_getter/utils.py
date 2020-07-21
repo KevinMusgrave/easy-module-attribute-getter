@@ -62,7 +62,7 @@ def merge_two_dicts(x, y, curr_depth=0, max_merge_depth=0,
                         z[k] = merge_two_dicts(z[k], v, curr_depth+1, max_merge_depth)   
                 else:
                     z[k] = v
-            # apply = True, so apply v to all sub dictionaries
+            # apply = True, so replace the value at apply_depth with v
             else:
                 if isinstance(z[k], dict):
                     z[k] = apply_to_dict(z[k], v, 0, apply_depth)
