@@ -10,15 +10,33 @@ def load_yaml(fname):
 def all_are_dicts(list_of_candidates):
     return all(isinstance(x, dict) for x in list_of_candidates)
 
-def apply_to_dict(x, y, curr_depth, apply_depth):
-    if curr_depth == apply_depth:
-        return merge_two_dicts(x, y)
+def swap_keys(x, y):
+    for k,v in y.items():
+        if (v is not None) and (v != {}):
+            x[v] = x[k]
+            x.pop(k)
+        else:
+            assert len(x) == 1
+            only_key = list(x.keys())[0]
+            x[k] = x[only_key]
+            x.pop(only_key)
+    return x
+
+def apply_to_dict(x, y, curr_depth, depth, swap=False):
     z = x.copy()
+    if curr_depth == depth:
+        if swap:
+            return swap_keys(z,y)
+        else:
+            return merge_two_dicts(z, y)
     for k in z.keys():
         if isinstance(z[k], dict):
-            z[k] = apply_to_dict(z[k], y, curr_depth+1, apply_depth)
-        elif (curr_depth + 1) == apply_depth:
-            z[k] = y
+            z[k] = apply_to_dict(z[k], y, curr_depth+1, depth)
+        elif (curr_depth + 1) == depth:
+            if swap:
+                z = swap_keys(z,y)
+            else:
+                z[k] = y
     return z
 
 
@@ -28,13 +46,15 @@ def merge_two_dicts(x, y, curr_depth=0, max_merge_depth=0,
                     only_existing_keys=False, only_non_existing_keys=False,
                     force_override_key_word='~OVERRIDE~',
                     apply_key_word='~APPLY~',
-                    delete_key_word='~DELETE~'):
+                    delete_key_word='~DELETE~',
+                    swap_key_word='~SWAP~'):
     if curr_depth > max_merge_depth:
         return y
     z = x.copy()
     for key, v in y.items():
-        force_override, apply, delete = False, False, False
+        force_override, apply, delete, swap = False, False, False, False
         apply_string = re.search("{}[0-9]+$".format(apply_key_word), key)
+        swap_string = re.search("{}[0-9]+$".format(swap_key_word), key)
         # override z if the key ends with ~OVERRIDE~
         if key.endswith(force_override_key_word):
             k = re.sub('\%s$'%force_override_key_word, '', key)
@@ -44,7 +64,15 @@ def merge_two_dicts(x, y, curr_depth=0, max_merge_depth=0,
             apply_string = apply_string.group()
             k = re.sub('\%s$'%apply_string, '', key)
             apply_depth = int(apply_string.replace(apply_key_word, ""))
+            assert apply_depth > 0
             apply = True
+        elif swap_string:
+            assert isinstance(v, dict), "The {} keyword can only be used on dictionaries".format(swap_key_word)
+            swap_string = swap_string.group()
+            k = re.sub('\%s$'%swap_string, '', key)
+            swap_depth = int(swap_string.replace(swap_key_word, ""))
+            assert swap_depth > 0
+            swap = True
         elif key.endswith(delete_key_word):
             k = re.sub('\%s$'%delete_key_word, '', key)
             delete = True
@@ -54,7 +82,7 @@ def merge_two_dicts(x, y, curr_depth=0, max_merge_depth=0,
             if delete:
                 z.pop(k, None)
             # merging 2 subdictionaries  
-            elif not apply:
+            elif (not apply) and (not swap):
                 if (k in z) and all_are_dicts([z[k], v]):
                     if force_override:
                         z[k] = v
@@ -62,10 +90,13 @@ def merge_two_dicts(x, y, curr_depth=0, max_merge_depth=0,
                         z[k] = merge_two_dicts(z[k], v, curr_depth+1, max_merge_depth)   
                 else:
                     z[k] = v
-            # apply = True, so replace the value at apply_depth with v
+            # apply or swap is True. 
+            # If apply, then merge v into z[k], at depth apply_depth
+            # If swap, then replace the key at a swap_depth with v
             else:
+                depth = apply_depth if apply else swap_depth
                 if isinstance(z[k], dict):
-                    z[k] = apply_to_dict(z[k], v, 0, apply_depth)
+                    z[k] = apply_to_dict(z[k], v, 1, depth, swap=swap)
     return z
 
 

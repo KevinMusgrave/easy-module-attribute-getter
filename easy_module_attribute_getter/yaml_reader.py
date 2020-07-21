@@ -12,7 +12,8 @@ class YamlReader:
     def __init__(self, argparser=None, 
                 force_override_key_word="~OVERRIDE~", 
                 apply_key_word="~APPLY~",
-                delete_key_word = "~DELETE~"):
+                delete_key_word = "~DELETE~",
+                swap_key_word = "~SWAP~"):
         self.argparser = argparser if argparser is not None else argparse.ArgumentParser(allow_abbrev=False)
         self.args, self.unknown_args = self.argparser.parse_known_args()
         if argparser is not None:
@@ -21,6 +22,7 @@ class YamlReader:
         self.force_override_key_word = force_override_key_word
         self.apply_key_word = apply_key_word
         self.delete_key_word = delete_key_word
+        self.swap_key_word = swap_key_word
 
     def validate_command_line_input(self):
         char_counts = defaultdict(int)
@@ -98,7 +100,8 @@ class YamlReader:
                                                 max_merge_depth=max_merge_depth,
                                                 force_override_key_word=self.force_override_key_word,
                                                 apply_key_word=self.apply_key_word,
-                                                delete_key_word=self.delete_key_word)
+                                                delete_key_word=self.delete_key_word,
+                                                swap_key_word=self.swap_key_word)
                 if merge_argparse:
                     curr_yaml = c_f.merge_two_dicts(curr_yaml, 
                                                     self.args.__dict__, 
@@ -106,7 +109,8 @@ class YamlReader:
                                                     only_existing_keys=True, 
                                                     force_override_key_word=self.force_override_key_word,
                                                     apply_key_word=self.apply_key_word,
-                                                    delete_key_word=self.delete_key_word)
+                                                    delete_key_word=self.delete_key_word,
+                                                    swap_key_word=self.swap_key_word)
 
                 self.dict_of_yamls[config_name] = curr_yaml
         
@@ -114,7 +118,7 @@ class YamlReader:
         for config in self.dict_of_yamls.values():
             self.loaded_yaml = c_f.merge_two_dicts(self.loaded_yaml, config, max_merge_depth=0)
 
-        for key_word in [self.force_override_key_word, self.apply_key_word, self.delete_key_word]:
+        for key_word in [self.force_override_key_word, self.apply_key_word, self.delete_key_word, self.swap_key_word]:
             c_f.remove_key_word_recursively(self.args.__dict__, key_word)
 
         self.args = c_f.merge_two_dicts(self.loaded_yaml, 
@@ -123,7 +127,8 @@ class YamlReader:
                                         only_non_existing_keys=True, 
                                         force_override_key_word=self.force_override_key_word,
                                         apply_key_word=self.apply_key_word,
-                                        delete_key_word=self.delete_key_word)
+                                        delete_key_word=self.delete_key_word,
+                                        swap_key_word=self.swap_key_word)
         self.args = SimpleNamespace(**self.args)
 
         return self.args, self.loaded_yaml, self.dict_of_yamls
