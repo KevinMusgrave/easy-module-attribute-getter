@@ -13,9 +13,10 @@ def all_are_dicts(list_of_candidates):
 def swap_keys(x, y):
     for k,v in y.items():
         if (v is not None) and (v != {}):
-            x[v] = x[k]
-            x.pop(k)
-        else:
+            if k in x:
+                x[v] = x[k]
+                x.pop(k)
+        elif k not in x:
             assert len(x) == 1
             only_key = list(x.keys())[0]
             x[k] = x[only_key]
@@ -31,7 +32,7 @@ def apply_to_dict(x, y, curr_depth, depth, swap=False):
             return merge_two_dicts(z, y)
     for k in z.keys():
         if isinstance(z[k], dict):
-            z[k] = apply_to_dict(z[k], y, curr_depth+1, depth)
+            z[k] = apply_to_dict(z[k], y, curr_depth+1, depth, swap=swap)
         elif (curr_depth + 1) == depth:
             if swap:
                 z = swap_keys(z,y)
@@ -103,12 +104,18 @@ def merge_two_dicts(x, y, curr_depth=0, max_merge_depth=0,
 def remove_key_word(input_dict, key_word):
     override_list = []
     for key, v in input_dict.items():
+        key_word_with_number = re.search("{}[0-9]+$".format(key_word), key)
         if key.endswith(key_word):
             k = re.sub('\%s$'%key_word, '', key)
-            override_list.append((k,v))
-    for (k, v) in override_list:
+            override_list.append((key,k,v))
+        elif key_word_with_number:
+            key_word_with_number = key_word_with_number.group()
+            k = re.sub('\%s$'%key_word_with_number, '', key)
+            override_list.append((key,k,v))
+
+    for (original_key, k, v) in override_list:
         input_dict[k] = v
-        input_dict.pop(k+key_word, None)
+        input_dict.pop(original_key, None)
 
 
 def remove_key_word_recursively(args_dict, keyword):
