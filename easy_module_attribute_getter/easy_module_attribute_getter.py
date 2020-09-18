@@ -36,8 +36,26 @@ class EasyModuleAttributeGetter:
                                  return_uninitialized=return_uninitialized)
         return output
 
+
     def register(self, obj_name, new_module, prepend=True):
         assert inspect.ismodule(new_module) or inspect.isclass(new_module)
         curr = getattr(self, obj_name) if hasattr(self, obj_name) else []
         module_list = [new_module] + curr if prepend else curr + [new_module]
         setattr(self, obj_name, module_list)
+
+
+    def unregister(self, obj_name, existing_module):
+        is_str = isinstance(existing_module, str)
+        assert inspect.ismodule(existing_module) or inspect.isclass(existing_module) or is_str
+        curr = getattr(self, obj_name, None)
+        if curr is None:
+            logging.warning("Trying to unregister a module from {0} but {0} doesn't exist".format(obj_name))
+            return
+        if is_str:
+            curr = [x.__name__ for x in curr]
+        if existing_module not in curr:
+            logging.warning("Trying to unregister {0} from {1} but {0} doesn't exist".format(existing_module.__name__, obj_name))
+            return  
+        curr = [x for x in curr if x != existing_module]
+        setattr(self, obj_name, curr)
+
