@@ -7,7 +7,6 @@ setuptools.setup(
     name="easy-module-attribute-getter",
     version="0.9.41",
     author="Kevin Musgrave",
-    author_email="tkm45@cornell.edu",
     description="Select module classes and functions using yaml, without any if-statements.",
     long_description=long_description,
     long_description_content_type="text/markdown",
